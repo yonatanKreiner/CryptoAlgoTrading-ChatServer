@@ -24,11 +24,11 @@ var bitfinex = null;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-
- bit2c.find({}).limit(10).toArray(function(err, docs) {
+ var limit = parseInt(req.query.limit);
+ bit2c.find({}).limit(limit).toArray(function(err, docs) {
    assert.equal(err, null);
    var bit2cTickers = docs;
-   bitfinex.find({}).limit(10).toArray(function(err, docs1) {
+   bitfinex.find({}).limit(limit).toArray(function(err, docs1) {
       assert.equal(err, null);
       var bitfinexTickers = docs1;
       
