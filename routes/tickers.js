@@ -7,10 +7,12 @@ var db = null;
 var bit2c = null;
 var bitfinex = null;
   // Connection URL
-  const url = 'mongodb://ariel:ariel@ds127536.mlab.com:27536/collector';
-  
+  const url = 'mongodb://bitteamisrael:Ariel241096@ds135667-a0.mlab.com:35667,ds135667-a1.mlab.com:35667/bitteamdb?replicaSet=rs-ds135667';
+  //const url = 'mongodb://ariel:ariel@ds127536.mlab.com:27536/collector';
+
   // Database Name
-  const dbName = 'collector';
+  const dbName = 'bitteamdb';
+  //const dbName = 'collector';
 
   // Use connect method to connect to the server
   MongoClient.connect(url, function(err, client) {
@@ -24,15 +26,20 @@ var bitfinex = null;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
- var limit = parseInt(req.query.limit);
- bit2c.find({}).limit(limit).toArray(function(err, docs) {
+ var fromDate = new Date(req.query.fromDate);
+ var toDate = new Date(req.query.toDate);
+ var filter = {"date": {$lte:toDate, $gte:fromDate}}
+ var sort = { date: 1 };
+ var projection = {_id:0, 'ask':1, 'date':1,'bid':1};
+ bit2c.find(filter).project(projection).sort(sort).toArray(function(err, docs) {
    assert.equal(err, null);
    var bit2cTickers = docs;
-   bitfinex.find({}).limit(limit).toArray(function(err, docs1) {
+   var bit2cTickersCount = docs.length;
+   bitfinex.find(filter).project(projection).sort(sort).toArray(function(err, docs1) {
       assert.equal(err, null);
       var bitfinexTickers = docs1;
-      
-      res.send({bit2cTickers:bit2cTickers,bitfinexTickers:bitfinexTickers });
+      var bitfinexTickersCount = docs1.length;
+      res.send({bit2cTickersCount:bit2cTickersCount,bitfinexTickersCount:bitfinexTickersCount,bit2cTickers:bit2cTickers,bitfinexTickers:bitfinexTickers});
   });
 });
 });
