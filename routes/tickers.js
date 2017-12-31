@@ -28,9 +28,13 @@ var bitfinex = null;
 router.get('/', function(req, res, next) {
  var fromDate = new Date(req.query.fromDate);
  var toDate = new Date(req.query.toDate);
+
+ fromDate.setHours(fromDate.getHours() - 2);
+ toDate.setHours(toDate.getHours() - 2);
+
  var filter = {"date": {$lte:toDate, $gte:fromDate}}
  var sort = { date: 1 };
- var projection = {_id:0, 'ask':1, 'date':1,'bid':1};
+ var projection = {_id:1, 'ask':1, 'date':1,'bid':1};
  bit2c.find(filter).project(projection).sort(sort).toArray(function(err, docs) {
    assert.equal(err, null);
    var bit2cTickers = docs;

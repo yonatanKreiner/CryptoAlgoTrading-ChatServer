@@ -27,6 +27,9 @@ router.get('/', function(req, res, next) {
   var fromDate = new Date(req.query.fromDate);
   var toDate = new Date(req.query.toDate);
 
+  fromDate.setHours(fromDate.getHours() - 2);
+  toDate.setHours(toDate.getHours() - 2);
+
  offlineTransactions.find({}).toArray(function(err, transactions) {
    var transaction = transactions[1];
    var result = [];
