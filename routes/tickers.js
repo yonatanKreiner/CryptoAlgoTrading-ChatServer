@@ -1,51 +1,50 @@
-var express = require('express');
-var router = express.Router();
-
+const express = require('express');
+const router = express.Router();
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
-var db = null;
-var bit2c = null;
-var bitfinex = null;
-  // Connection URL
-  const url = 'mongodb://bitteamisrael:Ariel241096@ds135667-a0.mlab.com:35667,ds135667-a1.mlab.com:35667/bitteamdb?replicaSet=rs-ds135667';
-  //const url = 'mongodb://ariel:ariel@ds127536.mlab.com:27536/collector';
 
-  // Database Name
-  const dbName = 'bitteamdb';
-  //const dbName = 'collector';
+let db = null;
+let bit2c = null;
+let bitfinex = null;
+// Connection URL
+const url = 'mongodb://bitteamisrael:Ariel241096@ds135667-a0.mlab.com:35667,ds135667-a1.mlab.com:35667/bitteamdb?replicaSet=rs-ds135667';
+//const url = 'mongodb://ariel:ariel@ds127536.mlab.com:27536/collector';
 
-  // Use connect method to connect to the server
-  MongoClient.connect(url, function(err, client) {
-   assert.equal(null, err);
-   console.log("Connected successfully to server");
-  
-    db = client.db(dbName);
-    bit2c = db.collection('bit2c');
-    bitfinex = db.collection('bitfinex');
-  });
+// Database Name
+const dbName = 'bitteamdb';
+//const dbName = 'collector';
+
+// Use connect method to connect to the server
+MongoClient.connect(url, function(err, client) {
+  assert.equal(null, err);
+  console.log("Connected successfully to server");
+  db = client.db(dbName);
+  bit2c = db.collection('bit2c');
+  bitfinex = db.collection('bitfinex');
+});
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
- var fromDate = new Date(req.query.fromDate);
- var toDate = new Date(req.query.toDate);
+router.get('/', async (req, res, next) => {
+  let fromDate = new Date(req.query.fromDate);
+  let toDate = new Date(req.query.toDate);
 
- fromDate.setHours(fromDate.getHours() - 2);
- toDate.setHours(toDate.getHours() - 2);
+  fromDate.setHours(fromDate.getHours() - 2);
+  toDate.setHours(toDate.getHours() - 2);
 
- var filter = {"date": {$lte:toDate, $gte:fromDate}}
- var sort = { date: 1 };
- var projection = {_id:0, 'ask':1, 'date':1,'bid':1};
- bit2c.find(filter).project(projection).sort(sort).toArray(function(err, docs) {
-   assert.equal(err, null);
-   var bit2cTickers = docs;
-   var bit2cTickersCount = docs.length;
-   bitfinex.find(filter).project(projection).sort(sort).toArray(function(err, docs1) {
-      assert.equal(err, null);
-      var bitfinexTickers = docs1;
-      var bitfinexTickersCount = docs1.length;
-      res.send({bit2cTickersCount:bit2cTickersCount,bitfinexTickersCount:bitfinexTickersCount,bit2cTickers:bit2cTickers,bitfinexTickers:bitfinexTickers});
-  });
-});
+  let filter = {"date": {$lte:toDate, $gte:fromDate}}
+  let sort = { date: 1 };
+  let projection = {_id:0, 'ask':1, 'date':1,'bid':1};
+  let bit2Cursor = await bit2c.find(filter).project(projection).sort(sort);
+  let bit2cTickers  = await bit2Cursor.toArray();
+  let bit2cTickersCount = bit2cTickers.length;
+  let bitfinexCursor = await bitfinex.find(filter).project(projection).sort(sort);
+  let bitfinexTickers = await bitfinexCursor.toArray();
+  let bitfinexTickersCount = bitfinexTickers.length;
+
+  res.send({bit2cTickersCount:bit2cTickersCount,
+            bitfinexTickersCount:bitfinexTickersCount,
+            bit2cTickers:bit2cTickers,
+            bitfinexTickers:bitfinexTickers});
 });
 
 module.exports = router;
