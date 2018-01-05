@@ -30,9 +30,9 @@ router.get('/', async (req, res, next) => {
   fromDate.setHours(fromDate.getHours() - 2);
   toDate.setHours(toDate.getHours() - 2);
 
-  transactionsCursor = await offlineTransactions.find({});
+  let transactionsCursor = await offlineTransactions.find({});
   let transactions = await transactionsCursor.toArray();
-  let transaction = transactions[1];
+  let transaction = transactions[4];
   let result = [];
 
   for (let i= 0; i < transaction.transactions.length; i++){
