@@ -32,7 +32,7 @@ router.get('/', async (req, res, next) => {
 
   let transactionsCursor = await offlineTransactions.find({});
   let transactions = await transactionsCursor.toArray();
-  let transaction = transactions[4];
+  let transaction = transactions[8];
   let result = [];
 
   for (let i= 0; i < transaction.transactions.length; i++){
