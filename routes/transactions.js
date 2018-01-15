@@ -26,13 +26,18 @@ MongoClient.connect(url, function(err, client) {
 router.get('/', async (req, res, next) => {
   let fromDate = new Date(req.query.fromDate);
   let toDate = new Date(req.query.toDate);
+  let number = req.query.number;
 
   fromDate.setHours(fromDate.getHours() - 2);
   toDate.setHours(toDate.getHours() - 2);
 
   let transactionsCursor = await offlineTransactions.find({});
   let transactions = await transactionsCursor.toArray();
-  let transaction = transactions[8];
+  if (!number){
+    number = transactions.length - 1;
+  }
+
+  let transaction = transactions[number];
   let result = [];
 
   for (let i= 0; i < transaction.transactions.length; i++){
