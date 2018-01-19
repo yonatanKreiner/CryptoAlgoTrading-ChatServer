@@ -9,11 +9,10 @@ var compression  =require('compression');
 
 var index = require('./routes/index');
 var tickers = require('./routes/tickers');
-var transactions = require('./routes/transactions');
+var offlineTransactions = require('./routes/offlineTransactions');
+var onlineTransactions = require('./routes/onlineTransactions');
 
 var app = express();
-
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,7 +30,8 @@ app.use(compression());
 
 app.use('/', index);
 app.use('/tickers', tickers);
-app.use('/transactions', transactions);
+app.use('/offlineTransactions', offlineTransactions);
+app.use('/onlineTransactions', onlineTransactions);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
